@@ -186,6 +186,10 @@ fieldRadius :: GLdouble
 fieldRadius = 0.75
 fieldRadiusF :: GLfloat
 fieldRadiusF = 0.75
+pitRadius :: GLdouble
+pitRadius = 0.35
+pitRadiusF :: GLfloat
+pitRadiusF = 0.35
 
 renderCat :: IO ()
 renderCat  = preservingMatrix $ do
@@ -261,7 +265,7 @@ pileCoord tot (Chez Chatul) = (-0.8,-0.7)
 pileCoord tot (Chez Kelev) = (0.8,-0.7)
 
 coordPile :: Int -> Coord2d -> Maybe FieldPos
-coordPile tot (x,y) | x^2 + y^2 < fieldRadiusF^2 =
+coordPile tot (x,y) | x^2 + y^2 < fieldRadiusF^2 && x^2 + y^2 > pitRadiusF^2 =
           let theta = atan(y/x) in
           let theta' = case (x,y) of
                  (x,y) | x>=0 && y>=0 -> theta
@@ -314,6 +318,8 @@ renderState state = do
   recenter (0,0)
   fieldColor
   sphere fieldRadius 1 1 1
+  boardColor
+  sphere pitRadius 1 1 1
   renderPiles piles
 
   renderPile (take cats (repeat Chatul)) (pileCoord npiles (Chez Chatul))
@@ -341,6 +347,16 @@ renderState state = do
   scal 0.001 0.001 0.001
   renderString Roman (show (length ds))
 
+  let winner = if length cs >= gThresh standard then Just Chatul else
+               if length ds >= gThresh standard then Just Kelev else
+               Nothing
+  case winner of
+       Just p -> do
+        recenter (0,0)
+        scal 2 2 2
+        renderAnimal p
+       Nothing -> return ()
+       
   -- render an arrow indicating whose turn it is
   recenter (0,0.9)
   scal 0.6 0.6 0.6
