@@ -100,16 +100,29 @@ doMove (PP (x, i)) s =
        let board'' = push i (board',a) in
        s { board = board'', prev = Just (PP (x,i)), turn = neg (turn s), debug = "did move" ++ show x ++ " -> " ++ show i }
 
+checkLegal :: State -> Move -> a -> (String -> a) -> a
+checkLegal s (PP (Chez Chatul, i)) ks kf =
+        let (cats,piles,dogs) = board s in
+        if turn s /= Chatul then kf ("Kelev can't take from Chatul's house") else
+        if cats == 0 then kf ("No chatlulim left in house") else
+        if length (piles !! i) >= gHeight standard then kf ("pile too high") else
+        ks
+checkLegal s (PP (Chez Kelev, i)) ks kf =
+        let (cats,piles,dogs) = board s in
+        if turn s /= Kelev then kf ("Chatul can't take from Kelev's house") else
+        if dogs == 0 then kf ("No klalavim left in house") else
+        if length (piles !! i) >= gHeight standard then kf ("pile too high") else
+        ks
+checkLegal s (PP (Field j, i)) ks kf =
+        let (cats,piles,dogs) = board s in
+        if i == j then kf ("self-move") else
+        if length (piles !! j) == 0 then kf ("empty pile") else
+        if length (piles !! i) >= gHeight standard then kf ("pile too high") else
+        if not (isCool s j) then kf ("hot piece") else
+        ks
+
 isLegal :: State -> Move -> Bool
-isLegal s (PP (Chez Chatul, i)) =
-        let (cats,piles,dogs) = board s in
-        turn s == Chatul && cats > 0 && length (piles !! i) < 3
-isLegal s (PP (Chez Kelev, i)) =
-        let (cats,piles,dogs) = board s in
-        turn s == Kelev && dogs > 0 && length (piles !! i) < 3
-isLegal s (PP (Field j, i)) =
-        let (cats,piles,dogs) = board s in
-        i /= j && length (piles !! j) > 0 && length (piles !! i) < 3 && isCool s j
+isLegal s m = checkLegal s m True (\_ -> False)
 
 color3f r g b = color $ Color3 r g (b :: GLfloat)
 color4f r g b a = color $ Color4 r g (b :: GLfloat) a
@@ -391,8 +404,10 @@ keyboard state (MouseButton LeftButton) Down _ (Position x y) =  do
   let locstring = "loc = " ++ show p -- ++  "abs = " ++ show (x,y) ++ " rel = " ++ show (x',y')
   case (highlight s,p) of
     (Nothing,p) -> state $= s { highlight = p, debug = locstring }
-    (Just h,Just (Field i)) | isLegal s (PP (h,i)) -> state $= (doMove (PP (h,i)) s) { highlight = Nothing }
-                                  | otherwise -> state $= s { highlight = Nothing, debug = "illegal move!: " ++ show h ++ " -> " ++ show p ++ " at " ++ locstring }
+    (Just h,Just (Field i)) ->
+          checkLegal s (PP (h,i))
+                     (state $= (doMove (PP (h,i)) s) { highlight = Nothing })
+                     (\err -> state $= s { highlight = Nothing, debug = "illegal move!: " ++ show h ++ " -> " ++ show p ++ " at " ++ locstring ++ "(" ++ err ++ ")" })
     (Just h,_) -> state $= s { highlight = Nothing, debug = "non pile, " ++ locstring }
   postRedisplay Nothing
 keyboard _ _ _ _ _ = return ()
