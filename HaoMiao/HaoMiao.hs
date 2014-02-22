@@ -355,6 +355,16 @@ renderState state = do
         recenter (0,0)
         scal 2 2 2
         renderAnimal p
+        loadIdentity
+        recenter (-pitRadiusF, -pitRadiusF*0.2 )
+        color3f 0 0 0
+        scal 0.002 0.002 0.002
+        renderString Roman ("winner!")
+        loadIdentity
+        recenter (-pitRadiusF*1.01, -pitRadiusF*0.2*1.01 )
+        color3f 1 1 0
+        scal 0.002 0.002 0.002
+        renderString Roman ("winner!")
        Nothing -> return ()
        
   -- render an arrow indicating whose turn it is
