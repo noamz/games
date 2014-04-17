@@ -5,11 +5,32 @@
 module Dancing where
 
 {-
- The game is best played with four people, using two strands of rope, in three rounds.  At the beginning of the game, the players arrange themselves in a square, and will then move around the square according to the rules described below.  In these instructions I will refer to the players by their *current* position on the square, which may be respectively NW, NE, SW, or SE.  In an actual game, obvious accomodations can be made for playing with fewer than four people (though preferably at least two), in which case one person may simultaneously occupy two or more positions.
+ The game is best played with four people, using two strands of rope,
+in three rounds.  At the beginning of the game, the players arrange
+themselves in a square, and will then move around the square according
+to the rules described below.  In these instructions I will refer to
+the players by their *current* position on the square, which may be
+respectively NW, NE, SW, or SE.  In an actual game, obvious
+accomodations can be made for playing with fewer than four people
+(though preferably at least two), in which case one person may
+simultaneously occupy two or more positions.
 
- Round 1 ("Preparation"). The players begin by using some procedure to agree on a rational number q. For example, they might take the average of the birthdays (DD/MM or MM/DD) of each player, or they might each write down a rational and then take the second smallest one, etc. Then the players arrange themselves into the "0 tangle", with the pair NW-NE standing opposite the pair SW-SE, each pair holding a strand of rope between them.
+ Round 1 ("Preparation"). The players begin by using some procedure to
+agree on a rational number q. For example, they might take the average
+of the birthdays (DD/MM or MM/DD) of each player, or they might each
+write down a rational and then take the second smallest one, etc. Then
+the players arrange themselves into the "0 tangle", with the pair
+NW-NE standing opposite the pair SW-SE, each pair holding a strand of
+rope between them.
 
- Round 2 ("Dance"). The players use a series of "crossing" moves (or "C-move" for short) in order to go from the initial position to the tangle representing the rational number q. During a C-move, either the pair of players SW-SE exchanges positions, or the pair NE-SE exchanges positions. In either case, in order for the players to exchange positions while holding onto their ropes, one will have to crouch/limbo under the other player's rope (making for a total of four possible C-moves).
+ Round 2 ("Dance"). The players use a series of "crossing" moves (or
+"C-move" for short) in order to go from the initial position to the
+tangle representing the rational number q. During a C-move, either the
+pair of players SW-SE exchanges positions, or the pair NE-SE exchanges
+positions. In either case, in order for the players to exchange
+positions while holding onto their ropes, one will have to
+crouch/limbo under the other player's rope (making for a total of four
+possible C-moves).
 -}
 
 data CMove = SWSE | SESW | NESE | SENE
@@ -32,7 +53,12 @@ dance q = reverse (map neg $ down q)
     neg NESE = SENE
 
 {-
- Round 3 ("Undance"). The players use a series of "PSL(2,Z)" moves (or "P-move" for short) in order to go from the tangle representing q back down to the initial position 0.  A P-move is either an "add", which is the same thing as a C-move NE-SE with SE crossing under NE, or else a "turn", which consists of all four players simultaneously moving one position clockwise around the square.
+ Round 3 ("Undance"). The players use a series of "PSL(2,Z)" moves (or
+"P-move" for short) in order to go from the tangle representing q back
+down to the initial position 0.  A P-move is either an "add", which is
+the same thing as a C-move NE-SE with SE crossing under NE, or else a
+"turn", which consists of all four players simultaneously moving one
+position clockwise around the square.
 -}
     
 data PMove = Add | Turn
